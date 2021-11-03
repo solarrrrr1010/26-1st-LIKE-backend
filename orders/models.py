@@ -36,7 +36,7 @@ class Review(TimeStampModel):
     user           = models.ForeignKey('users.User', on_delete=models.CASCADE)
     title          = models.CharField(max_length=100)
     text           = models.CharField(max_length=2000)
-    rating         = models.DecimalField(max_digits=1, decimal_places=1)
+    rating         = models.DecimalField(max_digits=2, decimal_places=1)
     deleted_at     = models.DateTimeField(null=True)
 
     class Meta:
