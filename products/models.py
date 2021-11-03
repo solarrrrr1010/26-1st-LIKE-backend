@@ -8,23 +8,23 @@ class MainCategory(models.Model):
 
 
 class SubCategory(models.Model):
-    name = models.CharField(max_length=100)
-    main = models.ForeignKey('MainCategory', on_delete=models.CASCADE)
+    name          = models.CharField(max_length=100)
+    main_category = models.ForeignKey('MainCategory', on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'sub_categories'
 
 
 class Product(models.Model):
-    serial            = models.CharField(max_length=200)
-    title             = models.CharField(max_length=100)
-    sub_title         = models.CharField(max_length=100)
-    price             = models.DecimalField(max_digits=9, decimal_places=2)
-    thumbnail         = models.CharField(max_length=2000,blank=True)
-    eco_friendly      = models.BooleanField(default=False)
-    current_color     = models.CharField(max_length=2000)
-    description_title = models.CharField(max_length=2000)
-    description       = models.CharField(max_length=2000)
+    serial              = models.CharField(max_length=200, unique=True)
+    title               = models.CharField(max_length=100)
+    sub_title           = models.CharField(max_length=100)
+    price               = models.DecimalField(max_digits=9, decimal_places=2)
+    thumbnail_image_url = models.CharField(max_length=2000, blank=True)
+    eco_friendly        = models.BooleanField(default=False)
+    current_color       = models.CharField(max_length=2000)
+    description_title   = models.CharField(max_length=2000)
+    description         = models.CharField(max_length=2000)
 
     class Meta:
         db_table = 'products'
