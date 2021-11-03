@@ -1,11 +1,5 @@
-from django.db import models
-
-class TimeStampModel(models.Model):
-    created_at = models.DateTimeField(auto_now_add = True)
-    updated_at = models.DateTimeField(auto_now = True)
-
-    class Meta:
-        abstract = True
+from django.db      import models
+from core.models    import TimeStampModel
 
 class ShoppingCart(models.Model):
     product_option = models.ForeignKey('products.ProductOption', on_delete=models.CASCADE)
