@@ -14,8 +14,7 @@ class SignupView(View):
             email        = data["email"]
             password     = data["password"]
             phone_number = data["phone_number"]
-            address      = data["address"]
-
+            
             if not re.match('^[a-zA-Z0-9+-_.]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-_]+$', email):
                 return JsonResponse({"message" : "EMAIL_VALIDATION_ERROR"}, status=400)
 
@@ -32,7 +31,6 @@ class SignupView(View):
                 password     = hashed_password,
                 name         = name,
                 phone_number = phone_number,
-                address      = address
             )
             
             return JsonResponse({"message" : "SUCCESS"}, status=201)
