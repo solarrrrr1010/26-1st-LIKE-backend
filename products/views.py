@@ -20,20 +20,6 @@ class ProductListView(View):
         color    = request.GET.get('color', None)
         size     = request.GET.get('size', None)
 
-        # products = [{
-        #     "id"                  : product.id,
-        #     "serial"              : product.serial,
-        #     "title"               : product.title,
-        #     "sub_title"           : product.sub_title,
-        #     "price"               : product.price,
-        #     "thumbnail_image_url" : product.thumbnail_image_url,
-        #     "eco_friendly"        : product.eco_friendly,
-        #     "main_category"       : product.sub_category.main_category.name
-        # } for product in Product.objects.all()]
-
-        # results = [product for product in products if product["main_category"] == category]
-
-
         products = [{
             "product"             : po.product_id,
             "color"               : po.color.name,
