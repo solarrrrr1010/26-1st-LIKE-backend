@@ -1,6 +1,6 @@
 from django.views       import View
 from django.http        import JsonResponse
-from products.models    import MainCategory, SubCategory, Product 
+from products.models    import MainCategory, SubCategory, Product, ProductOption
 
 class CategoryListView(View):
     def get(self, request):
@@ -14,29 +14,42 @@ class CategoryListView(View):
         } for main in MainCategory.objects.all() ]
         return JsonResponse({'results' : results}, status = 200)
 
-class ProductAllListView(View):
-    def get(self, request):
-        results = [{
-            "id"                  : product.id,
-            "serial"              : product.serial,
-            "title"               : product.title,
-            "sub_title"           : product.sub_title,
-            "price"               : product.price,
-            "thumbnail_image_url" : product.thumbnail_image_url,
-            "eco_friendly"        : product.eco_friendly,
-            "sub_category"        : product.sub_cateory_id
-        } for product in Product.objects.all()]
-        return JsonResponse({'results' : results}, status = 200)
-
 class ProductListView(View):
-    def get(self, request, category):
-        results = [{
-            "id"                  : product.id,
-            "serial"              : product.serial,
-            "title"               : product.title,
-            "sub_title"           : product.sub_title,
-            "price"               : product.price,
-            "thumbnail_image_url" : product.thumbnail_image_url,
-            "eco_friendly"        : product.eco_friendly
-        } for product in Product.objects.filter(sub_category_id=category)]
+    def get(self, request):
+        category = request.GET.get('category', None)
+        color    = request.GET.get('color', None)
+        size     = request.GET.get('size', None)
+
+        # products = [{
+        #     "id"                  : product.id,
+        #     "serial"              : product.serial,
+        #     "title"               : product.title,
+        #     "sub_title"           : product.sub_title,
+        #     "price"               : product.price,
+        #     "thumbnail_image_url" : product.thumbnail_image_url,
+        #     "eco_friendly"        : product.eco_friendly,
+        #     "main_category"       : product.sub_category.main_category.name
+        # } for product in Product.objects.all()]
+
+        # results = [product for product in products if product["main_category"] == category]
+
+
+        products = [{
+            "product"             : po.product_id,
+            "color"               : po.color.name,
+            "size"                : po.size.type,
+            "serial"              : po.product.serial,
+            "title"               : po.product.title,
+            "sub_title"           : po.product.sub_title,
+            "price"               : po.product.price,
+            "thumbnail_image_url" : po.product.thumbnail_image_url,
+            "eco_friendly"        : po.product.eco_friendly,
+            "main_category"       : po.product.sub_category.main_category.name
+        } for po in ProductOption.objects.all()]
+
+        results = [product for product in products 
+                                if product["main_category"] == category 
+                                    and product["color"]    == color 
+                                    and product["size"]     == size]
+
         return JsonResponse({'results' : results}, status = 200)
