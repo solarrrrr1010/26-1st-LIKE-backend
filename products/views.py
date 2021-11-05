@@ -1,6 +1,7 @@
 from django.views       import View
 from django.http        import JsonResponse
-from products.models    import MainCategory, SubCategory, Product, ProductOption
+from django.db.models   import Q
+from products.models    import MainCategory, SubCategory, ProductOption
 
 class CategoryListView(View):
     def get(self, request):
@@ -20,7 +21,17 @@ class ProductListView(View):
         color    = request.GET.get('color', None)
         size     = request.GET.get('size', None)
 
-        products = [{
+        condition = Q()
+
+        if category:
+            condition.add(Q(product__sub_category__main_category__name=category), Q.AND)
+        if color:
+            condition.add(Q(color__name=color), Q.AND)
+        if size:
+            condition.add(Q(size__name=category), Q.AND)
+
+
+        results = [{
             "product"             : po.product_id,
             "color"               : po.color.name,
             "size"                : po.size.type,
@@ -31,11 +42,6 @@ class ProductListView(View):
             "thumbnail_image_url" : po.product.thumbnail_image_url,
             "eco_friendly"        : po.product.eco_friendly,
             "main_category"       : po.product.sub_category.main_category.name
-        } for po in ProductOption.objects.all()]
-
-        results = [product for product in products 
-                                if product["main_category"] == category 
-                                    and product["color"]    == color 
-                                    and product["size"]     == size]
+        } for po in ProductOption.objects.filter(condition)]
 
         return JsonResponse({'results' : results}, status = 200)
