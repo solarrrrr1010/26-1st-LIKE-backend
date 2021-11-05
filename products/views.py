@@ -14,7 +14,7 @@ class CategoryListView(View):
         } for main in MainCategory.objects.all() ]
         return JsonResponse({'results' : results}, status = 200)
 
-class ProductListView(View):
+class ProductAllListView(View):
     def get(self, request):
         results = [{
             "id"                  : product.id,
@@ -23,11 +23,12 @@ class ProductListView(View):
             "sub_title"           : product.sub_title,
             "price"               : product.price,
             "thumbnail_image_url" : product.thumbnail_image_url,
-            "eco_friendly"        : product.eco_friendly
+            "eco_friendly"        : product.eco_friendly,
+            "sub_category"        : product.sub_cateory_id
         } for product in Product.objects.all()]
         return JsonResponse({'results' : results}, status = 200)
 
-class ShoesListView(View):
+class ProductListView(View):
     def get(self, request, category):
         results = [{
             "id"                  : product.id,
@@ -37,5 +38,5 @@ class ShoesListView(View):
             "price"               : product.price,
             "thumbnail_image_url" : product.thumbnail_image_url,
             "eco_friendly"        : product.eco_friendly
-        } for product in Product.objects.filter(sub_=category)]
+        } for product in Product.objects.filter(sub_category_id=category)]
         return JsonResponse({'results' : results}, status = 200)
