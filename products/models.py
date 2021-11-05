@@ -16,6 +16,7 @@ class SubCategory(models.Model):
 
 
 class Product(models.Model):
+    sub_category        = models.ForeignKey('SubCategory', on_delete=models.CASCADE)
     serial              = models.CharField(max_length=200, unique=True)
     title               = models.CharField(max_length=100)
     sub_title           = models.CharField(max_length=100)
