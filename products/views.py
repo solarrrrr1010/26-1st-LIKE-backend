@@ -20,8 +20,10 @@ class ProductListView(View):
         category = request.GET.get('category', None)
         color    = request.GET.get('color', None)
         size     = request.GET.get('size', None)
-
+        sort     = request.GET.get('sort', '-id')
+        
         condition = Q()
+        ordering = f'product__{sort}'
 
         if category:
             condition.add(Q(product__sub_category__main_category__name=category), Q.AND)
@@ -30,6 +32,8 @@ class ProductListView(View):
         if size:
             condition.add(Q(size__name=category), Q.AND)
 
+        if '-' in sort:
+            ordering = f"-{ordering.replace('-','')}" 
 
         results = [{
             "product"             : po.product_id,
@@ -42,6 +46,6 @@ class ProductListView(View):
             "thumbnail_image_url" : po.product.thumbnail_image_url,
             "eco_friendly"        : po.product.eco_friendly,
             "main_category"       : po.product.sub_category.main_category.name
-        } for po in ProductOption.objects.filter(condition)]
+        } for po in ProductOption.objects.filter(condition).order_by(ordering)]
 
         return JsonResponse({'results' : results}, status = 200)
