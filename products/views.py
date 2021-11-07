@@ -28,17 +28,15 @@ class ProductListView(View):
             filter_field.get(key) : value for (key, value) in dict(request.GET).items() if filter_field.get(key)
         }
 
-        sort     = request.GET.get('sort', '-id')
-        ordering = f'{sort}'
-        if '-' in sort:
-            ordering = f"-{ordering.replace('-','')}" 
+        sort     = request.GET.get('sort', None)
+        ordering = '-id' if sort == None else sort
         
         results = [{
             "product"             : product.id,
             "serial"              : product.serial,
             "title"               : product.title,
             "sub_title"           : product.sub_title,
-            "price"               : product.price,
+            "price"               : float(product.price),
             "thumbnail_image_url" : product.thumbnail_image_url,
             "eco_friendly"        : product.eco_friendly,
             "color"               : product.productoption_set.first().color.name,
