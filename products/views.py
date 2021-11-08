@@ -2,7 +2,7 @@ from django.views       import View
 from django.http        import JsonResponse
 from django.db.models   import Sum
 
-from products.models    import MainCategory, SubCategory, Product
+from products.models    import MainCategory, SubCategory, Product, ProductOption
 
 class CategoryListView(View):
     def get(self, request):
@@ -45,3 +45,30 @@ class ProductListView(View):
         } for product in Product.objects.filter(**filter_set).order_by(ordering)]
 
         return JsonResponse({'results' : results}, status = 200)
+
+class DetailView(View):
+    def get(self, request, details_id):
+        try:
+            product   = Product.objects.get(id=details_id)
+            images    = [i['url'] for i in product.productimage_set.filter(product_id=product.id).values('url')]
+            po_sort   = ProductOption.objects.all().order_by('size_id')
+            size_quan = [{"sizeName" : po.size.type, "quantity" : po.quantity} for po in po_sort.filter(product_id=product.id)]
+            results   = {
+                "product_id"        : product.id,
+                "price"             : product.price,
+                "product_images"    : images,
+                "sub_title"         : product.sub_title,
+                "title"             : product.title,
+                "price"             : int(product.price),
+                "eco_friendly"      : product.eco_friendly,
+                "size_quan"         : size_quan,
+                "description_title" : product.description_title,
+                "description"       : product.description,
+                "current_color"     : product.current_color,
+                "serial"            : product.serial
+            }
+
+            return JsonResponse({'results' : results}, status = 200)
+
+        except KeyError:
+            return JsonResponse({"message" : "KEY_ERROR"}, status=401)        
