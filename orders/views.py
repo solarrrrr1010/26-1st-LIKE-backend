@@ -39,3 +39,5 @@ class CartListView(View):
             
         except KeyError:
             return JsonResponse({"message" : "KEY_ERROR"}, status=400)
+        except ProductOption.DoesNotExist:
+            return JsonResponse({"message": "INVALID_SHOPPING_CART"}, status=401)
