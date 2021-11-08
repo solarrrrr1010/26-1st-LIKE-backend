@@ -12,11 +12,12 @@ class CartListView(View):
         results = [{
             "id"                  : cart.id,
             "product_id"          : cart.product_option.product.id,
+            "user_id"             : cart.user_id,
             "product_title"       : cart.product_option.product.title,
             "serial"              : cart.product_option.product.serial,
             "size"                : cart.product_option.size.type,
-            "quantity"            : cart.product_option.product.quantity,
-            "price"               : cart.product_option.product.price,
+            "quantity"            : cart.quantity,
+            "price"               : float(cart.product_option.product.price * cart.quantity),
             "thumbnail_image_url" : cart.product_option.product.thumbnail_image_url,
 		} for cart in ShoppingCart.objects.all()]
         
@@ -29,7 +30,6 @@ class CartListView(View):
         try:
             product_option = ProductOption.objects.get(product_id=data['product_id'], size__type=data['size'])
             
-            # TODO : data['quantity'] type 확인
             ShoppingCart.objects.create(
                 user_id           = request.user.id,
                 product_option_id = product_option.id,
