@@ -19,7 +19,7 @@ class CartListView(View):
             "quantity"            : cart.quantity,
             "price"               : float(cart.product_option.product.price * cart.quantity),
             "thumbnail_image_url" : cart.product_option.product.thumbnail_image_url,
-		} for cart in ShoppingCart.objects.all()]
+		} for cart in ShoppingCart.objects.filter(user_id=request.user.id)]
         
         return JsonResponse({"results" : results}, status=200)
 
