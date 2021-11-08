@@ -4,6 +4,8 @@ from django.views import View
 from django.http import HttpResponse, JsonResponse
 from django.conf import settings
 
+from users.decorators import login_decorator
+
 from .models import User
 
 class SignupView(View):

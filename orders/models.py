@@ -12,7 +12,7 @@ class Order(TimeStampModel):
     product_option   = models.ForeignKey('products.ProductOption', on_delete=models.CASCADE)
     user             = models.ForeignKey('users.User', on_delete=models.CASCADE)
     order_status     = models.ForeignKey('OrderStatus', on_delete=models.CASCADE)
-    order_number     = models.CharField(max_length=100, unique=True)
+    order_number     = models.CharField(max_length=100)
     shipping_address = models.CharField(max_length=2000)
     price            = models.DecimalField(max_digits=9, decimal_places=2)
     quantity         = models.IntegerField(default=0)
