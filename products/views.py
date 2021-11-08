@@ -27,7 +27,7 @@ class ProductListView(View):
         filter_set = {
             filter_field.get(key) : value for (key, value) in dict(request.GET).items() if filter_field.get(key)
         }
-        sort = request.GET.get('sort', '-id')
+        ordering = request.GET.get('sort', '-id')
         
         results = [{
             "product"             : product.id,
@@ -42,6 +42,6 @@ class ProductListView(View):
             "quantity"            : product.productoption_set.values('quantity').aggregate(Sum('quantity'))['quantity__sum'],
             "sub_category"        : product.sub_category.name,  
             "main_category"       : product.sub_category.main_category.name
-        } for product in Product.objects.filter(**filter_set).order_by(sort)]
+        } for product in Product.objects.filter(**filter_set).order_by(ordering)]
 
         return JsonResponse({'results' : results}, status = 200)
