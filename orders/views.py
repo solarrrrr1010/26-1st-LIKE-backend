@@ -20,17 +20,14 @@ class CartListView(View):
             "quantity"            : cart.quantity,
             "price"               : float(cart.product_option.product.price * cart.quantity),
             "thumbnail_image_url" : cart.product_option.product.thumbnail_image_url,
-		} for cart in ShoppingCart.objects.filter(user_id=request.user.id)
-                                            .select_related('product_option__product')
-                                            .select_related('product_option__size')]
+		} for cart in ShoppingCart.objects.filter(user_id=request.user.id)\
+                                          .select_related('product_option__product','product_option__size')]
         
         return JsonResponse({"results" : results}, status=200)
 
     @login_required
     def post(self, request):
         data = json.loads(request.body)
-
-        print('data :',data)
 
         try:
             product_option = ProductOption.objects.get(product_id=data['product_id'], size__type=data['size'])
@@ -46,7 +43,6 @@ class CartListView(View):
             return JsonResponse({"message" : "KEY_ERROR"}, status=400)
         except ProductOption.DoesNotExist:
             return JsonResponse({"message": "DOES_NOT_EXIST_PRODUCT_OPTION"}, status=400)
-
 
     @login_required
     def delete(self, request):
