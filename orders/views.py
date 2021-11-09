@@ -5,10 +5,10 @@ from django.views       import View
 
 from orders.models      import ShoppingCart
 from products.models    import ProductOption
-from core.utils         import login_required
+# from core.utils         import login_required
 
 class CartListView(View):
-    @login_required
+    # @login_required
     def get(self, request):
         results = [{
             "id"                  : cart.id,
@@ -20,11 +20,13 @@ class CartListView(View):
             "quantity"            : cart.quantity,
             "price"               : float(cart.product_option.product.price * cart.quantity),
             "thumbnail_image_url" : cart.product_option.product.thumbnail_image_url,
-		} for cart in ShoppingCart.objects.filter(user_id=request.user.id)]
+		} for cart in ShoppingCart.objects.filter(user_id=request.user.id)
+                                            .select_related('product_option__product')
+                                            .select_related('product_option__size')]
         
         return JsonResponse({"results" : results}, status=200)
 
-    @login_required
+    # @login_required
     def post(self, request):
         data = json.loads(request.body)
 
@@ -41,4 +43,4 @@ class CartListView(View):
         except KeyError:
             return JsonResponse({"message" : "KEY_ERROR"}, status=400)
         except ProductOption.DoesNotExist:
-            return JsonResponse({"message": "INVALID_SHOPPING_CART"}, status=401)
+            return JsonResponse({"message": "DOES_NOT_EXIST_PRODUCT_OPTION"}, status=400)
