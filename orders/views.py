@@ -35,7 +35,6 @@ class CartListView(View):
             if data['quantity'] < 1 or data['quantity'] > product_option.quantity:
                 return JsonResponse({"message" : "INVALID_QUANTITY"}, status=400)
 
-
             ShoppingCart.objects.create(
                 user_id           = request.user.id,
                 product_option_id = product_option.id,
