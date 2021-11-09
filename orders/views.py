@@ -5,10 +5,10 @@ from django.views       import View
 
 from orders.models      import ShoppingCart
 from products.models    import ProductOption
-from core.utils         import login_decorator
+from core.utils         import login_required
 
 class CartListView(View):
-    @login_decorator
+    @login_required
     def get(self, request):
         results = [{
             "id"                  : cart.id,
@@ -24,7 +24,7 @@ class CartListView(View):
         
         return JsonResponse({"results" : results}, status=200)
 
-    @login_decorator
+    @login_required
     def post(self, request):
         data = json.loads(request.body)
 
