@@ -1,3 +1,4 @@
+from django.core.exceptions import MultipleObjectsReturned
 from django.views       import View
 from django.http        import JsonResponse
 from django.db.models   import Sum
@@ -50,9 +51,12 @@ class DetailView(View):
     def get(self, request, details_id):
         try:
             product   = Product.objects.get(id=details_id)
-            images    = [i['url'] for i in product.productimage_set.filter(product_id=product.id).values('url')]
+            images    = [image['url'] for image in product.productimage_set.filter(
+                product_id=product.id).values('url')]
             po_sort   = ProductOption.objects.all().order_by('size_id')
-            size_quan = [{"sizeName" : po.size.type, "quantity" : po.quantity} for po in po_sort.filter(product_id=product.id)]
+            size_quan = [{
+                "sizeName" : po.size.type, "quantity" : po.quantity
+                } for po in po_sort.filter(product_id=product.id)]
             results   = {
                 "product_id"        : product.id,
                 "price"             : product.price,
@@ -69,6 +73,12 @@ class DetailView(View):
             }
 
             return JsonResponse({'results' : results}, status = 200)
+            
+        except Product.DoesNotExist:
+            return JsonResponse({"message" : "Product does not exist"}, status=404)        
+
+        except MultipleObjectsReturned:
+            return JsonResponse({"message" : "MultipleObjectsReturned"}, status=404)    
 
         except KeyError:
             return JsonResponse({"message" : "KEY_ERROR"}, status=401)        
