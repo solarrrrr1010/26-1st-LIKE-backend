@@ -38,6 +38,9 @@ class OrderListView(View):
                 order_number   = uuid.uuid4()
                 product_option = ProductOption.objects.get(product_id=data['product_id'], size__type=data['size'])
 
+                if data['quantity'] < 1 or data['quantity'] > product_option.quantity:
+                    return JsonResponse({"message" : "INVALID_QUANTITY"}, status=400) 
+
                 Order.objects.create(
                     user_id           = request.user.id,
                     product_option_id = product_option.id,
