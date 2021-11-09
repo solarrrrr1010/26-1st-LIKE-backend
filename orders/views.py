@@ -1,5 +1,6 @@
 import json
 
+from json.decoder       import JSONDecodeError
 from django.http        import JsonResponse
 from django.views       import View
 
@@ -27,11 +28,14 @@ class CartListView(View):
 
     @login_required
     def post(self, request):
-        data = json.loads(request.body)
-
         try:
+            data = json.loads(request.body)
             product_option = ProductOption.objects.get(product_id=data['product_id'], size__type=data['size'])
             
+            if data['quantity'] < 1 or data['quantity'] > product_option.quantity:
+                return JsonResponse({"message" : "INVALID_QUANTITY"}, status=400)
+
+
             ShoppingCart.objects.create(
                 user_id           = request.user.id,
                 product_option_id = product_option.id,
@@ -39,6 +43,8 @@ class CartListView(View):
             )
             return JsonResponse({"message" : "SUCCESS"}, status=201)
             
+        except JSONDecodeError:
+            return JsonResponse({"message" : "JSON_DECODE_ERROR"}, status=400)
         except KeyError:
             return JsonResponse({"message" : "KEY_ERROR"}, status=400)
         except ProductOption.DoesNotExist:
@@ -46,13 +52,14 @@ class CartListView(View):
 
     @login_required
     def delete(self, request):
-        data = json.loads(request.body)
-
         try:
+            data = json.loads(request.body)
             ShoppingCart.objects.get(id=data['cart_id']).delete()
 
             return JsonResponse({"message" : "SUCCESS"}, status=204)
-            
+
+        except JSONDecodeError:
+            return JsonResponse({"message" : "JSON_DECODE_ERROR"}, status=400)
         except KeyError:
             return JsonResponse({"message" : "KEY_ERROR"}, status=400)
         except ProductOption.DoesNotExist:
