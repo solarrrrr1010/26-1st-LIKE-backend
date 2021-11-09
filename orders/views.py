@@ -3,12 +3,13 @@ import uuid
 
 from django.views       import View
 from django.http        import JsonResponse
+from django.db.models   import Sum, F
 
 from orders.models      import Order
 from products.models    import ProductOption
-
+from core.utils         import login_required
 class OrderListView(View):
-    # @login_required
+    @login_required
     def get(self, request):
         results = [{
             "id"                  : order.id,
@@ -22,13 +23,16 @@ class OrderListView(View):
             "size"                : order.product_option.size.type,
             "quantity"            : order.quantity,
             "price"               : order.price,
-            # "total_price"         : Order.objects.filter(user_id=3).aggregate(total_price=Sum(F('price') * F('quantity'))),
+            "total_price"         : Order.objects.filter(order_number=order.order_number).aggregate(total_price=Sum(F('price') * F('quantity')))['total_price'],
             "thumbnail_image_url" : order.product_option.product.thumbnail_image_url,
-        } for order in Order.objects.filter(user_id=request.user.id)]
+        } for order in Order.objects.filter(user_id=request.user.id)
+                                    .select_related('product_option__product')
+								    .select_related('product_option__size')
+    							    .select_related('order_status')]
 
         return JsonResponse({"results" : results}, status=200)
         
-    # @login_required
+    @login_required
     def post(self, request):
         try:
             data_list = json.loads(request.body)
