@@ -16,10 +16,13 @@ Including another URLconf
 from django.urls import path, include
 
 from products.views import CategoryListView
+from orders.views import CartListView
 
 urlpatterns = [
     path('users', include('users.urls')),
     path('products', include('products.urls')),
     path('orders', include('orders.urls')),
-    path('categories', CategoryListView.as_view())
+    path('categories', CategoryListView.as_view()),
+    path('carts', CartListView.as_view()),
+
 ]
