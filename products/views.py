@@ -75,10 +75,10 @@ class DetailView(View):
             return JsonResponse({'results' : results}, status = 200)
             
         except Product.DoesNotExist:
-            return JsonResponse({"message" : "Product does not exist"}, status=404)        
+            return JsonResponse({"message" : "Product does not exist"}, status=400)        
 
         except MultipleObjectsReturned:
-            return JsonResponse({"message" : "MultipleObjectsReturned"}, status=404)    
+            return JsonResponse({"message" : "MultipleObjectsReturned"}, status=400)    
 
         except KeyError:
             return JsonResponse({"message" : "KEY_ERROR"}, status=401)        
