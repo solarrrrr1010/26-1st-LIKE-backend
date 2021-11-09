@@ -11,7 +11,7 @@ class CartListView(View):
     @login_required
     def get(self, request):
         results = [{
-            "id"                  : cart.id,
+            "cart_id"             : cart.id,
             "product_id"          : cart.product_option.product.id,
             "user_id"             : cart.user_id,
             "product_title"       : cart.product_option.product.title,
@@ -30,6 +30,8 @@ class CartListView(View):
     def post(self, request):
         data = json.loads(request.body)
 
+        print('data :',data)
+
         try:
             product_option = ProductOption.objects.get(product_id=data['product_id'], size__type=data['size'])
             
@@ -39,6 +41,21 @@ class CartListView(View):
                 quantity          = data['quantity'],
             )
             return JsonResponse({"message" : "SUCCESS"}, status=201)
+            
+        except KeyError:
+            return JsonResponse({"message" : "KEY_ERROR"}, status=400)
+        except ProductOption.DoesNotExist:
+            return JsonResponse({"message": "DOES_NOT_EXIST_PRODUCT_OPTION"}, status=400)
+
+
+    @login_required
+    def delete(self, request):
+        data = json.loads(request.body)
+
+        try:
+            ShoppingCart.objects.get(id=data['cart_id']).delete()
+
+            return JsonResponse({"message" : "SUCCESS"}, status=204)
             
         except KeyError:
             return JsonResponse({"message" : "KEY_ERROR"}, status=400)
