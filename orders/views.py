@@ -8,9 +8,10 @@ from json.decoder       import JSONDecodeError
 from orders.models      import Order, ShoppingCart
 from products.models    import ProductOption
 from core.enums         import OrderStatus
-from core.utils         import login_required
+from core.utils         import login_required, count_queries 
 
 class OrderListView(View):
+    @count_queries
     @login_required
     def get(self, request):
         results = [{
@@ -20,6 +21,9 @@ class OrderListView(View):
             "shipping_address"    : order.shipping_address,
             "product_id"          : order.product_option.product.id,
             "user_id"             : order.user_id,
+            "user_name"           : order.user.name,
+            "user_email"          : order.user.email,
+            "user_phone_number"   : order.user.phone_number, 
             "product_title"       : order.product_option.product.title,
             "serial"              : order.product_option.product.serial,
             "size"                : order.product_option.size.type,
@@ -28,28 +32,29 @@ class OrderListView(View):
             "thumbnail_image_url" : order.product_option.product.thumbnail_image_url,
             "created_at"          : order.created_at
         } for order in Order.objects.filter(user_id=request.user.id)\
-                                    .select_related('product_option__product', 'product_option__size', 'order_status')]
+                                    .select_related('product_option__product', 'product_option__size', 'order_status', 'user')]
 
         return JsonResponse({"results" : results}, status=200)
         
     @login_required
     def post(self, request):
         try:
-            data_list = json.loads(request.body)
-            for data in data_list:
-                order_number   = uuid.uuid4()
-                product_option = ProductOption.objects.get(product_id=data['product_id'], size__type=data['size'])
+            data = json.loads(request.body)
+            order_number = uuid.uuid4()
+            
+            for order in data['order']:
+                product_option = ProductOption.objects.get(product_id=order['product_id'], size__type=order['size'])
 
-                if data['quantity'] < 1 or data['quantity'] > product_option.quantity:
+                if order['quantity'] < 1 or order['quantity'] > product_option.quantity:
                     return JsonResponse({"message" : "INVALID_QUANTITY"}, status=400) 
 
                 Order.objects.create(
                     user_id           = request.user.id,
                     product_option_id = product_option.id,
-                    quantity          = data['quantity'],
-                    price             = data['price'],
+                    quantity          = order['quantity'],
+                    price             = order['price'],
                     order_number      = order_number,
-                    order_status_id   = OrderStatus.Completed,
+                    order_status_id   = OrderStatus.Completed.value,
                 )
             return JsonResponse({"message" : "SUCCESS"}, status=201)
         
@@ -61,6 +66,7 @@ class OrderListView(View):
             return JsonResponse({"message": "DOES_NOT_EXIST_PRODUCT_OPTION"}, status=400)
 
 class CartListView(View):
+    @count_queries
     @login_required
     def get(self, request):
         results = [{
