@@ -2,8 +2,16 @@ from django.core.exceptions import MultipleObjectsReturned
 from django.views       import View
 from django.http        import JsonResponse
 from django.db.models   import Sum
+from like.settings import CACHE_TTL
 
 from products.models    import MainCategory, SubCategory, Product, ProductOption
+
+
+from django.conf                        import settings
+from django.core.cache.backends.base    import DEFAULT_TIMEOUT
+from django.views.decorators.cache      import cache_page
+
+CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
 
 class CategoryListView(View):
     def get(self, request):
@@ -18,6 +26,7 @@ class CategoryListView(View):
         return JsonResponse({'results' : results}, status = 200)
 
 class ProductListView(View):
+    @cache_page(CACHE_TTL)
     def get(self, request):
         filter_field = {
             'main_category' : "sub_category__main_category__id__in",  
