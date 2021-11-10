@@ -1,4 +1,5 @@
 import jwt
+import time
 
 from django.conf    import settings
 from django.http    import JsonResponse
@@ -33,5 +34,14 @@ def count_queries(func):
         finally:
             settings.DEBUG = False
             reset_queries()
+        return func(self, request)
+    return wrapper
+
+def measure_run_time(func):
+    def wrapper(self, request):
+        start = time.time()
+        func(self, request)
+        end = time.time()
+        print(f'time: {end - start}')
         return func(self, request)
     return wrapper
