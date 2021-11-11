@@ -38,12 +38,12 @@ class ProductListView(View):
             "price"               : float(product.price),
             "thumbnail_image_url" : product.thumbnail_image_url,
             "eco_friendly"        : product.eco_friendly,
-            "color"               : product.productoption_set.first().color.name,
+            "color"               : product.productoption_set.first().color.name if product.productoption_set.first() else '',
             "size"                : [po.size.type for po in product.productoption_set.all()],
             "quantity"            : product.productoption_set.values('quantity').aggregate(Sum('quantity'))['quantity__sum'],
             "sub_category"        : product.sub_category.name,  
             "main_category"       : product.sub_category.main_category.name
-        } for product in Product.objects.filter(**filter_set).order_by(ordering)]
+        } for product in Product.objects.filter(**filter_set).distinct().order_by(ordering)]
 
         return JsonResponse({'results' : results}, status = 200)
 
