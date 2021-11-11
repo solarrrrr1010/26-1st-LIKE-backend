@@ -1,17 +1,17 @@
 import json
 import uuid
 
-from django.views       import View
-from django.http        import JsonResponse
-from json.decoder       import JSONDecodeError
+from django.views           import View
+from django.http            import JsonResponse
+from json.decoder           import JSONDecodeError
+from django.core.exceptions import MultipleObjectsReturned
 
-from orders.models      import Order, ShoppingCart
-from products.models    import ProductOption
-from core.enums         import OrderStatus
-from core.utils         import login_required, count_queries 
+from orders.models          import Order, ShoppingCart
+from products.models        import ProductOption
+from core.enums             import OrderStatus
+from core.utils             import login_required 
 
 class OrderListView(View):
-    @count_queries
     @login_required
     def get(self, request):
         results = [{
@@ -56,17 +56,24 @@ class OrderListView(View):
                     order_number      = order_number,
                     order_status_id   = OrderStatus.Completed.value,
                 )
+                
+                # delete shopping cart data
+                cart_id = order.get('cart_id', None)
+                if cart_id:
+                    ShoppingCart.objects.get(id=cart_id).delete()
+                
             return JsonResponse({"message" : "SUCCESS"}, status=201)
         
         except JSONDecodeError:
             return JsonResponse({"message" : "JSON_DECODE_ERROR"}, status=400)
         except KeyError:
             return JsonResponse({"message" : "KEY_ERROR"}, status=400)
+        except MultipleObjectsReturned:
+            return JsonResponse({"message" : "MULTIPLE_OBJECTS_RETURNED"}, status=400)
         except ProductOption.DoesNotExist:
             return JsonResponse({"message": "DOES_NOT_EXIST_PRODUCT_OPTION"}, status=400)
 
 class CartListView(View):
-    @count_queries
     @login_required
     def get(self, request):
         results = [{
@@ -104,6 +111,8 @@ class CartListView(View):
             return JsonResponse({"message" : "JSON_DECODE_ERROR"}, status=400)
         except KeyError:
             return JsonResponse({"message" : "KEY_ERROR"}, status=400)
+        except MultipleObjectsReturned:
+            return JsonResponse({"message" : "MULTIPLE_OBJECTS_RETURNED"}, status=400)
         except ProductOption.DoesNotExist:
             return JsonResponse({"message": "DOES_NOT_EXIST_PRODUCT_OPTION"}, status=400)
 
