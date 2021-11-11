@@ -141,10 +141,10 @@ class ReviewView(View):
               
         result = {
             "total_number_of_reviews": len(reviews),
-            "average_rating": float(avg_rating),
+            "average_rating": float(avg_rating) if avg_rating != None else 0,
             "reviews": [{
                 "title"  : review.title,
-                "rating" : float(review.rating),
+                "rating" : float(review.rating) if review.rating != None else 0,
                 "name"   : review.user.name,
                 "date"   : DateFormat(review.created_at).format('Y.m.d'),
                 "serial" : review.product_option.product.serial,
