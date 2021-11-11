@@ -5,6 +5,7 @@ from django.views            import View
 from django.http             import JsonResponse
 from json.decoder            import JSONDecodeError
 from django.db.models        import Avg
+from django.core.exceptions import MultipleObjectsReturned
      
 from orders.models           import Order, ShoppingCart, ReviewImage, Review
 from products.models         import ProductOption
@@ -13,7 +14,6 @@ from core.utils              import login_required, count_queries
 from django.utils.dateformat import DateFormat
 
 class OrderListView(View):
-    @count_queries
     @login_required
     def get(self, request):
         results = [{
@@ -58,17 +58,24 @@ class OrderListView(View):
                     order_number      = order_number,
                     order_status_id   = OrderStatus.Completed.value,
                 )
+                
+                # delete shopping cart data
+                cart_id = order.get('cart_id', None)
+                if cart_id:
+                    ShoppingCart.objects.get(id=cart_id).delete()
+                
             return JsonResponse({"message" : "SUCCESS"}, status=201)
         
         except JSONDecodeError:
             return JsonResponse({"message" : "JSON_DECODE_ERROR"}, status=400)
         except KeyError:
             return JsonResponse({"message" : "KEY_ERROR"}, status=400)
+        except MultipleObjectsReturned:
+            return JsonResponse({"message" : "MULTIPLE_OBJECTS_RETURNED"}, status=400)
         except ProductOption.DoesNotExist:
             return JsonResponse({"message": "DOES_NOT_EXIST_PRODUCT_OPTION"}, status=400)
 
 class CartListView(View):
-    @count_queries
     @login_required
     def get(self, request):
         results = [{
@@ -106,6 +113,8 @@ class CartListView(View):
             return JsonResponse({"message" : "JSON_DECODE_ERROR"}, status=400)
         except KeyError:
             return JsonResponse({"message" : "KEY_ERROR"}, status=400)
+        except MultipleObjectsReturned:
+            return JsonResponse({"message" : "MULTIPLE_OBJECTS_RETURNED"}, status=400)
         except ProductOption.DoesNotExist:
             return JsonResponse({"message": "DOES_NOT_EXIST_PRODUCT_OPTION"}, status=400)
 
@@ -127,20 +136,26 @@ class CartListView(View):
 class ReviewView(View):
     @login_required
     def get(self, request, product_id):
-        reviews = Review.objects.filter(product_option__product__id=product_id)
-        Avg_rating = reviews.aggregate(Avg('rating'))['rating__avg']
-        results = [{
+        reviews    = Review.objects.filter(product_option__product__id=product_id)
+        avg_rating = reviews.aggregate(Avg('rating'))['rating__avg']
+        print(reviews, avg_rating)        
+        total      = {
             "total_review" : len(reviews),
-            "Avg_rating" : int(Avg_rating),
-            "title" : review.title,
-            "rating" : int(review.rating),
-            "name" : review.user.name,
-            "date" : DateFormat(review.created_at).format('Y.m.d'),
+            "avg_rating"   : float(avg_rating)
+        }
+        
+        results = [{
+            "title"  : review.title,
+            "rating" : float(review.rating),
+            "name"   : review.user.name,
+            "date"   : DateFormat(review.created_at).format('Y.m.d'),
             "serial" : review.product_option.product.serial,
-            "size" : review.product_option.size.type,
-            "text" : review.text,
-            "image" : ReviewImage.objects.filter(review_id=review.id)[0].url
+            "size"   : review.product_option.size.type,
+            "text"   : review.text,
+            "image"  : ReviewImage.objects.filter(review_id=review.id)[0].url
         } for review in reviews if ReviewImage.objects.filter(
             review_id=review.id)[0].url] 
+        
+        last_results = [total, results]
 
-        return JsonResponse({'results' : results}, status = 200)
+        return JsonResponse({'last_results' : last_results}, status = 200)
