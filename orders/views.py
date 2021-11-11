@@ -56,6 +56,12 @@ class OrderListView(View):
                     order_number      = order_number,
                     order_status_id   = OrderStatus.Completed.value,
                 )
+                
+                # delete shopping cart data
+                cart_id = order.get('cart_id', None)
+                if cart_id:
+                    ShoppingCart.objects.get(id=cart_id).delete()
+                
             return JsonResponse({"message" : "SUCCESS"}, status=201)
         
         except JSONDecodeError:
