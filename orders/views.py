@@ -1,15 +1,17 @@
 import json
 import uuid
 
-from django.views           import View
-from django.http            import JsonResponse
-from json.decoder           import JSONDecodeError
+from django.views            import View
+from django.http             import JsonResponse
+from json.decoder            import JSONDecodeError
+from django.db.models        import Avg
 from django.core.exceptions import MultipleObjectsReturned
-
-from orders.models          import Order, ShoppingCart
-from products.models        import ProductOption
-from core.enums             import OrderStatus
-from core.utils             import login_required 
+     
+from orders.models           import Order, ShoppingCart, ReviewImage, Review
+from products.models         import ProductOption
+from core.enums              import OrderStatus
+from core.utils              import login_required, count_queries
+from django.utils.dateformat import DateFormat
 
 class OrderListView(View):
     @login_required
@@ -130,3 +132,26 @@ class CartListView(View):
             return JsonResponse({"message" : "KEY_ERROR"}, status=400)
         except ProductOption.DoesNotExist:
             return JsonResponse({"message": "DOES_NOT_EXIST_PRODUCT_OPTION"}, status=400)
+
+class ReviewView(View):
+    @login_required
+    def get(self, request, product_id):
+        reviews    = Review.objects.filter(product_option__product__id=product_id)
+        avg_rating = reviews.aggregate(Avg('rating'))['rating__avg']
+              
+        result = {
+            "total_number_of_reviews": len(reviews),
+            "average_rating": float(avg_rating),
+            "reviews": [{
+                "title"  : review.title,
+                "rating" : float(review.rating),
+                "name"   : review.user.name,
+                "date"   : DateFormat(review.created_at).format('Y.m.d'),
+                "serial" : review.product_option.product.serial,
+                "size"   : review.product_option.size.type,
+                "text"   : review.text,
+                "image"  : ReviewImage.objects.filter(review_id=review.id)[0].url
+            } for review in reviews if ReviewImage.objects.filter(review_id=review.id)[0].url]
+        }
+
+        return JsonResponse({'result' : result}, status = 200)
