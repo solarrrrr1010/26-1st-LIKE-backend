@@ -138,7 +138,7 @@ class ReviewView(View):
     def get(self, request, product_id):
         reviews    = Review.objects.filter(product_option__product__id=product_id)
         avg_rating = reviews.aggregate(Avg('rating'))['rating__avg']
-        print(reviews, avg_rating)        
+        
         total      = {
             "total_review" : len(reviews),
             "avg_rating"   : float(avg_rating)
