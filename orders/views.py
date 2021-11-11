@@ -138,24 +138,20 @@ class ReviewView(View):
     def get(self, request, product_id):
         reviews    = Review.objects.filter(product_option__product__id=product_id)
         avg_rating = reviews.aggregate(Avg('rating'))['rating__avg']
-        
-        total      = {
-            "total_review" : len(reviews),
-            "avg_rating"   : float(avg_rating)
+              
+        result = {
+            "total_number_of_reviews": len(reviews),
+            "average_rating": float(avg_rating),
+            "reviews": [{
+                "title"  : review.title,
+                "rating" : float(review.rating),
+                "name"   : review.user.name,
+                "date"   : DateFormat(review.created_at).format('Y.m.d'),
+                "serial" : review.product_option.product.serial,
+                "size"   : review.product_option.size.type,
+                "text"   : review.text,
+                "image"  : ReviewImage.objects.filter(review_id=review.id)[0].url
+            } for review in reviews if ReviewImage.objects.filter(review_id=review.id)[0].url]
         }
-        
-        results = [{
-            "title"  : review.title,
-            "rating" : float(review.rating),
-            "name"   : review.user.name,
-            "date"   : DateFormat(review.created_at).format('Y.m.d'),
-            "serial" : review.product_option.product.serial,
-            "size"   : review.product_option.size.type,
-            "text"   : review.text,
-            "image"  : ReviewImage.objects.filter(review_id=review.id)[0].url
-        } for review in reviews if ReviewImage.objects.filter(
-            review_id=review.id)[0].url] 
-        
-        last_results = [total, results]
 
-        return JsonResponse({'last_results' : last_results}, status = 200)
+        return JsonResponse({'result' : result}, status = 200)
