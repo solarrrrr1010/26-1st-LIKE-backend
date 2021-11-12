@@ -5,7 +5,7 @@ from django.core.exceptions import MultipleObjectsReturned
 from django.core.cache      import cache
 
 from products.models        import MainCategory, SubCategory, Product, ProductOption
-from core.utils             import measure_run_time
+from core.utils             import count_queries
 
 class CategoryListView(View):
     def get(self, request):
@@ -20,7 +20,7 @@ class CategoryListView(View):
         return JsonResponse({'results' : results}, status = 200)
 
 class ProductListView(View):
-    @measure_run_time
+    @count_queries
     def get(self, request):
         filter_field = {
             'main_category' : "sub_category__main_category__id__in",  
@@ -34,26 +34,33 @@ class ProductListView(View):
         ordering = request.GET.get('sort', '-id')
         
         # redis cache
-        if not cache.get('products'):
-            results = [{
-                "product"             : product.id,
-                "serial"              : product.serial,
-                "title"               : product.title,
-                "sub_title"           : product.sub_title,
-                "price"               : float(product.price),
-                "thumbnail_image_url" : product.thumbnail_image_url,
-                "eco_friendly"        : product.eco_friendly,
-                "color"               : product.productoption_set.first().color.name,
-                "size"                : [po.size.type for po in product.productoption_set.all()],
-                "quantity"            : product.productoption_set.values('quantity').aggregate(Sum('quantity'))['quantity__sum'],
-                "sub_category"        : product.sub_category.name,  
-                "main_category"       : product.sub_category.main_category.name
-            } for product in Product.objects.filter(**filter_set).order_by(ordering)]
-            data = cache.set('products', results)
-        data=cache.get('products')
+        if cache.get('products'):
+            data=cache.get('products')
+            return JsonResponse({'results' : data}, status = 200)
+
+        results = [{
+            "product"             : product.id,
+            "serial"              : product.serial,
+            "title"               : product.title,
+            "sub_title"           : product.sub_title,
+            "price"               : float(product.price),
+            "thumbnail_image_url" : product.thumbnail_image_url,
+            "eco_friendly"        : product.eco_friendly,
+            "color"               : product.productoption_set.first().color.name,
+            "size"                : [po.size.type for po in product.productoption_set.all()],
+            "quantity"            : product.productoption_set.values('quantity').aggregate(Sum('quantity'))['quantity__sum'],
+            "sub_category"        : product.sub_category.name,  
+            "main_category"       : product.sub_category.main_category.name
+        } for product in Product.objects.filter(**filter_set)\
+                                        .select_related('sub_category__main_category')\
+                                        .prefetch_related('productoption_set__size', 'productoption_set__color').distinct()
+                                        .order_by(ordering)]
+
+        data = cache.set('products', results)
         return JsonResponse({'results' : data}, status = 200)
 
 class DetailView(View):
+    @count_queries
     def get(self, request, details_id):
         try:
             product   = Product.objects.get(id=details_id)

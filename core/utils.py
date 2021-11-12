@@ -28,20 +28,14 @@ def count_queries(func):
     def wrapper(self, request):
         try:
             settings.DEBUG = True   
+            start = time.time()
             func(self, request)
+            end = time.time()
             print(f'query performance count : {len(connection.queries)}')
+            print(f'run time: {end - start}')
     
         finally:
             settings.DEBUG = False
             reset_queries()
-        return func(self, request)
-    return wrapper
-
-def measure_run_time(func):
-    def wrapper(self, request):
-        start = time.time()
-        func(self, request)
-        end = time.time()
-        print(f'time: {end - start}')
         return func(self, request)
     return wrapper
