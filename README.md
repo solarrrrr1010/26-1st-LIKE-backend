@@ -1,5 +1,7 @@
 # LIKE Project
 
+[웹 사이트](http://wecode26likeproject.s3-website.ap-northeast-2.amazonaws.com/) | [시연영상](https://drive.google.com/file/d/1TyeGsUcogieXJmMcxchkl2-tk5qylNw8/view?usp=sharing)
+
 ### 팀명 : LIKE - 라이키
 
 > 나이키 클론 프로젝트.
@@ -47,15 +49,15 @@
 
 > 로그인 & 회원가입
 
-- 로그인 & 회원가입 상세내용
+- Bcrypt 암호화
+- JWT access token 전송
+- Login Decorator
 
-> 상품 상세페이지
+> 상품 상세페이지 & 상품 리뷰
 
 - 상품 상세 페이지 조회
+- 상품 리뷰
 
-> 상품 리뷰
-
-- 리뷰 조회
 
 &nbsp;
 
@@ -63,49 +65,64 @@
 
 > 카테고리
 
-- 
+- Main, Sub 카테고리 조회
 
 > 메인페이지
 
-- 
+- 카테고리별 상품 조회
+- 색상, 사이즈 필터링
 
-> 장바구니
+> 장바구니 및 주문
 
-- 
-
-> 주문
-
-- 
+- 상품 옵션 별 장바구니 등록
+- 장바구니 내역에서 상품 주문
+- 주문 내역 확인
 
 &nbsp;
 
 ## 4. 결과물
 
-### 로그인 & 회원가입
+### 로그인
 
+<img width="1440" alt="Screen Shot 2021-11-13 at 2 50 32 PM" src="https://user-images.githubusercontent.com/22067260/141607594-8cea47d7-89c8-43c8-97e7-e142cb6947d5.png">
 
+### 회원가입
+
+<img width="1440" alt="Screen Shot 2021-11-13 at 1 16 03 PM" src="https://user-images.githubusercontent.com/22067260/141605403-02dbca63-8e94-4f36-a443-402e61daa55c.png">
 
 ### 메인 페이지
 
+<img width="1440" alt="Screen Shot 2021-11-13 at 1 10 22 PM" src="https://user-images.githubusercontent.com/22067260/141605212-3e8a7e92-9ed0-4a71-b091-1c91c6ff708e.png">
 
+<img width="1440" alt="Screen Shot 2021-11-13 at 1 14 42 PM" src="https://user-images.githubusercontent.com/22067260/141607599-034a4712-ea15-4e07-aae4-b730b0dfc6a2.png">
 
 ### 상세 페이지
 
+<img width="1440" alt="Screen Shot 2021-11-13 at 2 12 09 PM" src="https://user-images.githubusercontent.com/22067260/141606669-6b040a91-f51f-4913-99f2-cecbeb1a2a38.png">
 
 
 ### 장바구니 및 주문조회
 
+<img width="1440" alt="Screen Shot 2021-11-13 at 2 31 36 PM" src="https://user-images.githubusercontent.com/22067260/141607177-7a4748f3-64c1-4229-a2ad-499d6b9d5896.png">
 
 
+<img width="1440" alt="Screen Shot 2021-11-13 at 2 32 14 PM" src="https://user-images.githubusercontent.com/22067260/141607185-73b62508-a4b5-4baf-8dd6-82cec09a5d3e.png">
+
+
+### 주문조회
+
+<img width="1440" alt="Screen Shot 2021-11-13 at 2 32 39 PM" src="https://user-images.githubusercontent.com/22067260/141607195-163b8458-bfae-41a8-9f60-6c1732d00bb6.png">
 
 
 &nbsp;
 
+
 ## 소감
 
-- 
+#### 김봉철
 
-- 
+#### 이지은
+- [1차 프로젝트 후기 Link](https://jeleedev.tistory.com/158)
 
 &nbsp;
 
