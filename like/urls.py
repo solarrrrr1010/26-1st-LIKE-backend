@@ -16,7 +16,7 @@ Including another URLconf
 from django.urls import path, include
 
 from products.views import CategoryListView
-from orders.views import CartListView, ReviewView
+from orders.views import CartListView, ReviewView, ReviewPostDeleteView
 
 urlpatterns = [
     path('users', include('users.urls')),
@@ -24,5 +24,6 @@ urlpatterns = [
     path('orders', include('orders.urls')),
     path('categories', CategoryListView.as_view()),
     path('carts', CartListView.as_view()),
-    path('reviews/<int:product_id>', ReviewView.as_view())
+    path('reviews/#<int:product_id>', ReviewView.as_view()), 
+    path('reviews_post_delete', ReviewPostDeleteView.as_view())
 ]
