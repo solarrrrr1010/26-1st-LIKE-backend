@@ -1,9 +1,9 @@
+from django.views           import View
+from django.db.models       import Sum
+from django.http            import JsonResponse
 from django.core.exceptions import MultipleObjectsReturned
-from django.views       import View
-from django.http        import JsonResponse
-from django.db.models   import Sum
 
-from products.models    import MainCategory, SubCategory, Product, ProductOption
+from products.models        import MainCategory, SubCategory, Product, ProductOption
 
 class CategoryListView(View):
     def get(self, request):
@@ -43,7 +43,11 @@ class ProductListView(View):
             "quantity"            : product.productoption_set.values('quantity').aggregate(Sum('quantity'))['quantity__sum'],
             "sub_category"        : product.sub_category.name,  
             "main_category"       : product.sub_category.main_category.name
-        } for product in Product.objects.filter(**filter_set).distinct().order_by(ordering)]
+        } for product in Product.objects.filter(**filter_set)\
+                                        .select_related('sub_category__main_category')\
+                                        .prefetch_related('productoption_set__size', 'productoption_set__color')\
+                                        .distinct()\
+                                        .order_by(ordering)]
 
         return JsonResponse({'results' : results}, status = 200)
 
