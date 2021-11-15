@@ -122,7 +122,7 @@
 ## 소감
 
 #### 김봉철
-- [1차 프로젝트 후기 Link] (https://velog.io/@solarrrrr1010/%EC%9C%84%EC%BD%94%EB%93%9C-1%EC%B0%A8-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8%EB%A5%BC-%EB%A7%88%EC%B9%98%EB%A9%B0)
+- [1차 프로젝트 후기 Link](
 
 #### 이지은
 - [1차 프로젝트 후기 Link](https://jeleedev.tistory.com/158)
