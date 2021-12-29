@@ -1,6 +1,6 @@
 # LIKE Project
 
-[웹 사이트](http://wecode26likeproject.s3-website.ap-northeast-2.amazonaws.com/) | [시연영상](https://drive.google.com/file/d/1TyeGsUcogieXJmMcxchkl2-tk5qylNw8/view?usp=sharing)
+[시연영상](https://drive.google.com/file/d/1TyeGsUcogieXJmMcxchkl2-tk5qylNw8/view?usp=sharing)
 
 ### 팀명 : LIKE - 라이키
 
