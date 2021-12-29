@@ -6,7 +6,7 @@
 
 > 나이키 클론 프로젝트.
 >
-> 개발 초기 세팅부터 전부 직접 구현했으며, 실제 사용할 수 있는 서비스 수준으로 개발하는 것을 목표로 라이키 팀원들과 즐겁게 작업한 1차 프로젝트 입니다.
+> 개발 초기 세팅부터 전부 직접 구현했으며, 실제 사용할 수 있는 서비스 수준으로 개발하는 것을 목표로 라이키 팀원들과 즐겁게 작업한 1차 프로젝트입니다.
 
 #### 프로젝트 선정이유
 
@@ -20,8 +20,8 @@
 - 개발 기간 : 2021년 11월 01일 ~ 11월 12일
 
 - 개발 인원
-  - **Front-end** 3명 : 임연수, 전지완, 신유진 👉️ [Front-end github 링크](https://github.com/wecode-bootcamp-korea/26-1st-LIKE-frontend.git)
-  - **Back-end** 2명 : 이지은, 김봉철 👉️ [Back-end github 링크](https://github.com/wecode-bootcamp-korea/26-1st-LIKE-backend.git)
+  - **Front-end** 3명 👉️ [Front-end github 링크](https://github.com/wecode-bootcamp-korea/26-1st-LIKE-frontend.git)
+  - **Back-end** 2명 👉️ [Back-end github 링크](https://github.com/wecode-bootcamp-korea/26-1st-LIKE-backend.git)
 
 &nbsp;
 
@@ -45,8 +45,6 @@
 
 ### BACKEND ❤️
 
-#### 김봉철 
-
 > 로그인 & 회원가입
 
 - Bcrypt 암호화
@@ -60,25 +58,6 @@
 - 권한 있는 사용자 리뷰 작성
 - 특정 리뷰 삭제
 
-
-&nbsp;
-
-#### 이지은
-
-> 카테고리
-
-- Main, Sub 카테고리 조회
-
-> 메인페이지
-
-- 카테고리별 상품 조회
-- 색상, 사이즈 필터링
-
-> 장바구니 및 주문
-
-- 상품 옵션 별 장바구니 등록
-- 장바구니 내역에서 상품 주문
-- 주문 내역 확인
 
 &nbsp;
 
@@ -123,9 +102,6 @@
 
 #### 김봉철
 - [1차 프로젝트 후기 Link](
-
-#### 이지은
-- [1차 프로젝트 후기 Link](https://jeleedev.tistory.com/158)
 
 &nbsp;
 
