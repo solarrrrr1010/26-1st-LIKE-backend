@@ -8,7 +8,8 @@ from django.db.models        import Avg
 from django.core.exceptions import MultipleObjectsReturned
      
 from orders.models           import Order, ShoppingCart, ReviewImage, Review
-from products.models         import ProductOption
+from products.models         import ProductOption, Product
+
 from core.enums              import OrderStatus
 from core.utils              import login_required, count_queries
 from django.utils.dateformat import DateFormat
@@ -134,24 +135,67 @@ class CartListView(View):
             return JsonResponse({"message": "DOES_NOT_EXIST_PRODUCT_OPTION"}, status=400)
 
 class ReviewView(View):
-    @login_required
     def get(self, request, product_id):
-        reviews    = Review.objects.filter(product_option__product__id=product_id)
-        avg_rating = reviews.aggregate(Avg('rating'))['rating__avg']
-              
-        result = {
-            "total_number_of_reviews": len(reviews),
-            "average_rating": float(avg_rating) if avg_rating != None else 0,
-            "reviews": [{
-                "title"  : review.title,
-                "rating" : float(review.rating) if review.rating != None else 0,
-                "name"   : review.user.name,
-                "date"   : DateFormat(review.created_at).format('Y.m.d'),
-                "serial" : review.product_option.product.serial,
-                "size"   : review.product_option.size.type,
-                "text"   : review.text,
-                "image"  : ReviewImage.objects.filter(review_id=review.id)[0].url
-            } for review in reviews if ReviewImage.objects.filter(review_id=review.id)[0].url]
-        }
+        try:
+            reviews    = Review.objects.filter(product_option__product__id=product_id)
+            avg_rating = reviews.aggregate(Avg('rating'))['rating__avg']
 
-        return JsonResponse({'result' : result}, status = 200)
+            result = {
+                "total_number_of_reviews": len(reviews),
+                "average_rating": float(avg_rating) if avg_rating != None else 0,
+                "reviews": [{
+                    "title"  : review.title,
+                    "rating" : float(review.rating) if review.rating != None else 0,
+                    "name"   : review.user.name,
+                    "date"   : DateFormat(review.created_at).format('Y.m.d'),
+                    "serial" : review.product_option.product.serial,
+                    "size"   : review.product_option.size.type,
+                    "text"   : review.text,
+                    "image"  : ReviewImage.objects.filter(review_id=review.id)[0].url
+                } for review in reviews if ReviewImage.objects.filter(
+                    review_id=review.id)[0].url]
+            }
+
+            return JsonResponse({"result" : result}, status = 200)
+
+        except IndexError:
+            return JsonResponse({"message" : "INDEX_ERROR"}, status = 400)
+
+    @login_required
+    def post(self, request, product_id):
+        try:
+            data = json.loads(request.body)
+
+            if Review.objects.filter(product_option__product__id=product_id, user_id=request.user.id):
+                return JsonResponse({"message" : "THE_REVIEW_ALREADY_EXISTS."})
+
+            Review.objects.create(
+                title = data["title"],
+                rating = data["rating"],
+                text = data["text"],
+                user_id = request.user.id,
+                product_option_id = Order.objects.filter(
+                    user_id=request.user.id, product_option__product_id=product_id
+                )[0].product_option_id
+            )
+
+            return JsonResponse({"message" : "SUCCESS"}, status=201)
+
+        except IndexError:
+            return JsonResponse({"message" : "INDEX_ERROR"}, status=400) 
+        except KeyError:
+            return JsonResponse({"message" : "KEY_ERROR"}, status=400) 
+
+    @login_required
+    def delete(self, request, product_id):
+        try:
+            Review.objects.filter(user_id=request.user.id, product_option__product_id=product_id).delete()
+
+            return JsonResponse({"message" : "SUCCESS"}, status=200)
+        
+        except KeyError:
+            return JsonResponse({"message" : "KEY_ERROR"}, status=400)
+        except JSONDecodeError:
+            return JsonResponse({"message" : "JSON_DECODE_ERROR"}, status=400)
+        except Review.DoesNotExist:
+            return JsonResponse({"message" : "DOES_NOT_EXIST_REVIEW"}, status=400)
